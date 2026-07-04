@@ -1,0 +1,81 @@
+name: Deploy to Firebase Hosting
+description: >
+  Deploys a pre-built static directory to a Firebase Hosting target and trims
+  old releases to keep the site history lean.
+
+inputs:
+  firebase_project_id:
+    description: Firebase project ID (e.g. career-portal-prod)
+    required: true
+  hosting_target:
+    description: Firebase Hosting target name (e.g. career-portal)
+    required: true
+  service_account:
+    description: Firebase service account JSON (contents, not a file path)
+    required: true
+  build_dir:
+    description: Directory containing the built files to deploy (e.g. dist)
+    required: true
+  keep_releases:
+    description: Number of releases to keep. Older ones are deleted.
+    required: false
+    default: "5"
+
+outputs:
+  deploy_url:
+    description: The live Firebase Hosting URL after deploy
+    value: ${{ steps.deploy.outputs.deploy_url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install firebase-tools
+      shell: bash
+      run: npm install -g firebase-tools@latest --silent
+
+    - name: Write service account to disk
+      shell: bash
+      run: |
+        echo '${{ inputs.service_account }}' > /tmp/sa.json
+
+    - name: Write firebase.json for target
+      shell: bash
+      run: |
+        cat > /tmp/firebase-deploy.json <<EOF
+        {
+          "hosting": {
+            "target": "${{ inputs.hosting_target }}",
+            "public": "${{ inputs.build_dir }}",
+            "ignore": ["firebase.json", "**/.*"]
+          }
+        }
+        EOF
+
+    - name: Deploy to Firebase Hosting
+      id: deploy
+      shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
+      run: |
+        firebase deploy \
+          --only hosting:${{ inputs.hosting_target }} \
+          --project ${{ inputs.firebase_project_id }} \
+          --config /tmp/firebase-deploy.json \
+          --non-interactive 2>&1 | tee /tmp/deploy-output.txt
+
+        URL=$(grep -oP 'https://[^ ]+\.web\.app' /tmp/deploy-output.txt | head -1)
+        echo "deploy_url=${URL}" >> $GITHUB_OUTPUT
+
+    - name: Trim old releases
+      shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
+        FIREBASE_PROJECT_ID: ${{ inputs.firebase_project_id }}
+        HOSTING_SITE: ${{ inputs.hosting_target }}
+        KEEP_RELEASES: ${{ inputs.keep_releases }}
+      run: node ${{ github.action_path }}/scripts/trim-releases.mjs
+
+    - name: Clean up service account file
+      if: always()
+      shell: bash
+      run: rm -f /tmp/sa.json
