@@ -35,17 +35,21 @@ runs:
 
     - name: Write service account to disk
       shell: bash
-      run: |
-        echo '${{ inputs.service_account }}' > /tmp/sa.json
+      env:
+        SERVICE_ACCOUNT: ${{ inputs.service_account }}
+      run: printf '%s' "$SERVICE_ACCOUNT" > /tmp/sa.json
 
     - name: Write firebase.json for target
       shell: bash
+      env:
+        HOSTING_TARGET: ${{ inputs.hosting_target }}
+        BUILD_DIR: ${{ inputs.build_dir }}
       run: |
         cat > /tmp/firebase-deploy.json <<EOF
         {
           "hosting": {
-            "target": "${{ inputs.hosting_target }}",
-            "public": "${{ inputs.build_dir }}",
+            "target": "$HOSTING_TARGET",
+            "public": "$BUILD_DIR",
             "ignore": ["firebase.json", "**/.*"]
           }
         }
@@ -56,14 +60,16 @@ runs:
       shell: bash
       env:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
+        HOSTING_TARGET: ${{ inputs.hosting_target }}
+        FIREBASE_PROJECT_ID: ${{ inputs.firebase_project_id }}
       run: |
         firebase deploy \
-          --only hosting:${{ inputs.hosting_target }} \
-          --project ${{ inputs.firebase_project_id }} \
+          --only "hosting:$HOSTING_TARGET" \
+          --project "$FIREBASE_PROJECT_ID" \
           --config /tmp/firebase-deploy.json \
           --non-interactive 2>&1 | tee /tmp/deploy-output.txt
 
-        URL=$(grep -oP 'https://[^ ]+\.web\.app' /tmp/deploy-output.txt | head -1)
+        URL=$(grep -oE 'https://[^ ]+\.(web\.app|firebaseapp\.com)' /tmp/deploy-output.txt | head -1)
         echo "deploy_url=${URL}" >> $GITHUB_OUTPUT
 
     - name: Trim old releases
@@ -74,7 +80,7 @@ runs:
         HOSTING_SITE: ${{ inputs.hosting_target }}
         KEEP_RELEASES: ${{ inputs.keep_releases }}
       run: |
-        npm install --no-save google-auth-library 2>/dev/null
+        npm install --no-save google-auth-library
         node ${{ github.action_path }}/scripts/trim-releases.mjs
 
     - name: Clean up service account file
