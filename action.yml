@@ -79,8 +79,9 @@ runs:
         FIREBASE_PROJECT_ID: ${{ inputs.firebase_project_id }}
         HOSTING_SITE: ${{ inputs.hosting_target }}
         KEEP_RELEASES: ${{ inputs.keep_releases }}
+      working-directory: ${{ github.action_path }}
       run: |
-        npm install --no-save google-auth-library
+        npm install --no-save google-auth-library@10.9.0
         node ${{ github.action_path }}/scripts/trim-releases.mjs
 
     - name: Clean up service account file
