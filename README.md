@@ -32,7 +32,7 @@ The service account needs:
 
 ```yaml
 - name: Deploy to Firebase Hosting
-  uses: harisumiran/deploy-to-firebase-action@v1
+  uses: harisumiran/deploy-to-firebase-action@v1.0.0
   with:
     firebase_project_id: career-portal-prod
     hosting_target: career-portal
