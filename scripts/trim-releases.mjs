@@ -4,7 +4,7 @@
 
 import { GoogleAuth } from "google-auth-library";
 
-const { FIREBASE_PROJECT_ID, HOSTING_SITE, KEEP_RELEASES = "5" } = process.env;
+const { FIREBASE_PROJECT_ID, HOSTING_SITE, KEEP_RELEASES = "2" } = process.env;
 const keepCount = parseInt(KEEP_RELEASES, 10);
 if (!Number.isInteger(keepCount) || keepCount < 1) {
   console.error(`Invalid KEEP_RELEASES: "${KEEP_RELEASES}"`);
