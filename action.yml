@@ -19,7 +19,7 @@ inputs:
   keep_releases:
     description: Number of releases to keep. Older ones are deleted.
     required: false
-    default: "5"
+    default: "2"
 
 outputs:
   deploy_url:

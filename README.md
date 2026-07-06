@@ -12,7 +12,7 @@ this action handles deploying.
 | `hosting_target`       | Yes      | —       | Firebase Hosting target name (e.g. `career-portal`)         |
 | `service_account`      | Yes      | —       | Firebase service account JSON (contents, not a file path)   |
 | `build_dir`            | Yes      | —       | Directory containing the built files to deploy (e.g. `dist`) |
-| `keep_releases`        | No       | `5`     | Number of releases to keep. Older ones are deleted.         |
+| `keep_releases`        | No       | `2`     | Number of releases to keep. Older ones are deleted.         |
 
 ## Outputs
 
@@ -38,5 +38,5 @@ The service account needs:
     hosting_target: career-portal
     service_account: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
     build_dir: dist
-    keep_releases: "5"
+    keep_releases: "2"
 ```
