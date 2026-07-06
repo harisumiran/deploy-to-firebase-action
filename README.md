@@ -9,7 +9,7 @@ this action handles deploying.
 | Name                   | Required | Default | Description                                                |
 | ---------------------- | -------- | ------- | ------------------------------------------------------------ |
 | `firebase_project_id`  | Yes      | —       | Firebase project ID (e.g. `career-portal-prod`)             |
-| `hosting_target`       | Yes      | —       | Firebase Hosting target name (e.g. `career-portal`)         |
+| `hosting_target`       | Yes      | —       | Firebase Hosting site ID (e.g. `career-portal`)             |
 | `service_account`      | Yes      | —       | Firebase service account JSON (contents, not a file path)   |
 | `build_dir`            | Yes      | —       | Directory containing the built files to deploy (e.g. `dist`) |
 | `keep_releases`        | No       | `2`     | Number of releases to keep. Older ones are deleted.         |
