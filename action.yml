@@ -2,13 +2,16 @@ name: Deploy to Firebase Hosting
 description: >
   Deploys a pre-built static directory to a Firebase Hosting target and trims
   old releases to keep the site history lean.
+branding:
+  icon: upload-cloud
+  color: orange
 
 inputs:
   firebase_project_id:
     description: Firebase project ID (e.g. career-portal-prod)
     required: true
   hosting_target:
-    description: Firebase Hosting target name (e.g. career-portal)
+    description: Firebase Hosting site ID (e.g. career-portal)
     required: true
   service_account:
     description: Firebase service account JSON (contents, not a file path)
@@ -48,7 +51,7 @@ runs:
         cat > /tmp/firebase-deploy.json <<EOF
         {
           "hosting": {
-            "target": "$HOSTING_TARGET",
+            "site": "$HOSTING_TARGET",
             "public": "$BUILD_DIR",
             "ignore": ["firebase.json", "**/.*"]
           }
