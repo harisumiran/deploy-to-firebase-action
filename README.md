@@ -40,3 +40,15 @@ The service account needs:
     build_dir: dist
     keep_releases: "2"
 ```
+
+## Development
+
+### Running tests
+
+```bash
+npm test
+```
+
+The test suite calls `parseKeepCount()` and `pickReleasesToDelete()` from
+`scripts/trim-releases.mjs` directly with fixture inputs, using Node's built-in
+test runner (no dependencies to install).
