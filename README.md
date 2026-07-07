@@ -34,7 +34,7 @@ The service account needs:
 
 ```yaml
 - name: Deploy to Firebase Hosting
-  uses: harisumiran/deploy-to-firebase-action@v1.0.0
+  uses: harisumiran/deploy-to-firebase-action@v1
   with:
     firebase_project_id: career-portal-prod
     hosting_target: career-portal
@@ -65,6 +65,7 @@ The service account needs:
 npm test
 ```
 
-The test suite calls `parseKeepCount()` and `pickReleasesToDelete()` from
-`scripts/trim-releases.mjs` directly with fixture inputs, using Node's built-in
-test runner (no dependencies to install).
+The test suite calls the pure functions in `scripts/trim-releases.mjs`
+(`parseKeepCount()`, `pickReleasesToDelete()`) and `scripts/build-firebase-config.mjs`
+(`parseJsonArray()`, `buildFirebaseConfig()`) directly with fixture inputs, using
+Node's built-in test runner (no dependencies to install).
