@@ -23,6 +23,14 @@ inputs:
     description: Number of releases to keep. Older ones are deleted.
     required: false
     default: "2"
+  headers:
+    description: JSON array of Firebase Hosting header rules to apply (optional)
+    required: false
+    default: "[]"
+  rewrites:
+    description: JSON array of Firebase Hosting rewrite rules to apply (optional)
+    required: false
+    default: "[]"
 
 outputs:
   deploy_url:
@@ -47,16 +55,9 @@ runs:
       env:
         HOSTING_TARGET: ${{ inputs.hosting_target }}
         BUILD_DIR: ${{ inputs.build_dir }}
-      run: |
-        cat > /tmp/firebase-deploy.json <<EOF
-        {
-          "hosting": {
-            "site": "$HOSTING_TARGET",
-            "public": "$BUILD_DIR",
-            "ignore": ["firebase.json", "**/.*"]
-          }
-        }
-        EOF
+        HEADERS_JSON: ${{ inputs.headers }}
+        REWRITES_JSON: ${{ inputs.rewrites }}
+      run: node ${{ github.action_path }}/scripts/build-firebase-config.mjs > /tmp/firebase-deploy.json
 
     - name: Deploy to Firebase Hosting
       id: deploy

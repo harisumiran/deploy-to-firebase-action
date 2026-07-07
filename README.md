@@ -13,6 +13,8 @@ this action handles deploying.
 | `service_account`      | Yes      | —       | Firebase service account JSON (contents, not a file path)   |
 | `build_dir`            | Yes      | —       | Directory containing the built files to deploy (e.g. `dist`) |
 | `keep_releases`        | No       | `2`     | Number of releases to keep. Older ones are deleted.         |
+| `headers`              | No       | `[]`    | JSON array of Firebase Hosting header rules to apply         |
+| `rewrites`             | No       | `[]`    | JSON array of Firebase Hosting rewrite rules to apply         |
 
 ## Outputs
 
@@ -39,6 +41,20 @@ The service account needs:
     service_account: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
     build_dir: dist
     keep_releases: "2"
+    headers: |
+      [
+        {
+          "source": "/mount.js",
+          "headers": [
+            { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+            { "key": "Access-Control-Allow-Origin", "value": "*" }
+          ]
+        }
+      ]
+    rewrites: |
+      [
+        { "source": "/loadBundle", "destination": "/loadBundle.json" }
+      ]
 ```
 
 ## Development
