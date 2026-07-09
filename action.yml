@@ -57,7 +57,11 @@ runs:
         BUILD_DIR: ${{ inputs.build_dir }}
         HEADERS_JSON: ${{ inputs.headers }}
         REWRITES_JSON: ${{ inputs.rewrites }}
-      run: node ${{ github.action_path }}/scripts/build-firebase-config.mjs > /tmp/firebase-deploy.json
+      # Written into the caller's checkout (not /tmp): firebase deploy resolves
+      # "public" relative to the --config file's own directory, so the config
+      # must live next to $BUILD_DIR or the deploy fails with
+      # "Directory '<build_dir>' for Hosting does not exist."
+      run: node ${{ github.action_path }}/scripts/build-firebase-config.mjs > ./.deploy-to-firebase-action-config.json
 
     - name: Deploy to Firebase Hosting
       id: deploy
@@ -70,7 +74,7 @@ runs:
         firebase deploy \
           --only "hosting:$HOSTING_TARGET" \
           --project "$FIREBASE_PROJECT_ID" \
-          --config /tmp/firebase-deploy.json \
+          --config ./.deploy-to-firebase-action-config.json \
           --non-interactive 2>&1 | tee /tmp/deploy-output.txt
 
         URL=$(grep -oE 'https://[^ ]+\.(web\.app|firebaseapp\.com)' /tmp/deploy-output.txt | head -1)
@@ -91,4 +95,4 @@ runs:
     - name: Clean up service account file
       if: always()
       shell: bash
-      run: rm -f /tmp/sa.json
+      run: rm -f /tmp/sa.json ./.deploy-to-firebase-action-config.json
